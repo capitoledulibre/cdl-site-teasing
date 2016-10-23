@@ -5659,6 +5659,7 @@ button.close {
 .btn-cta {
   background-color: transparent;
   border-color: #FFF;
+  color: #eeeeee;
   font-family: texgyreadventor, sans-serif;
   font-size: 1.5em;
   margin-bottom: 0.5em;
