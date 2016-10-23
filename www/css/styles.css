@@ -5762,6 +5762,15 @@ button.close {
 /* Specific styles for blog site *
 *  Blog theme will use this built theme style.
 * */
+body.blog #header-wrapper {
+  background-position: left bottom;
+}
+body.blog #top {
+  margin-bottom: 20px;
+}
+body.blog #top img {
+  width: 200px;
+}
 .day-container + .day-container {
   margin-top: 6rem;
 }
