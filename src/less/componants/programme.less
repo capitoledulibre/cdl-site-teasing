@@ -1,35 +1,60 @@
 
-.header-room{
-  text-align: center;
-}
-.slot-times {
-  text-align: center;
-}
-.event{
-  text-align: center;
-}
-.event-title {
-  font-size: 80%;
-}
-.event-persons{
-  font-size: 70%;
-  font-style: italic;
+.day-container + .day-container{
+  margin-top: 6rem;
 }
 
-.event-type-conference {
-  background-color: #39af3a;
-}
+.program-table {
+  //table-layout: fixed;
 
-.event-type-atelier {
-  background-color: #6db3cc;
-}
+  .header-room{
+    text-align: center;
+    //width: 7rem;
+  }
+  .slot-times-header {
+    width: 4rem;
+  }
+  .slot-times-container {
+    display: inline-block;
+    height: 100%
+  }
+  .slot-times {
+    height: 100%;
+    display:flex;
+    flex-flow: column wrap;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .event{
+    text-align: center;
+    cursor: pointer;
+  }
+  tbody > tr > td.event {
+    vertical-align: middle;
+  }
+  .event-title {
+    font-size: 75%;
+    font-weight: bold;
+  }
+  .event-persons{
+    font-size: 70%;
+    font-style: italic;
+  }
 
-.event-type-keynote {
-  background-color: #e7e7e7;
-}
+  .event-type-conference {
+    background-color: #39af3a;
+  }
 
-.event-room {
-  font-size: 90%;
+  .event-type-atelier {
+    background-color: #6db3cc;
+  }
+
+  .event-type-keynote {
+    background-color: #e7e7e7;
+  }
+
+  .event-room {
+    font-size: 90%;
+  }
 }
 
 // spinning animation stolen from FontAwesome
@@ -45,5 +70,23 @@
   100% {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
+  }
+}
+
+#event-details-modal {
+  .event-title {
+    margin-bottom: 22px;
+  }
+  .event-info {
+    font-size: 90%
+  }
+  .event-abstract {
+    white-space: pre-wrap;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #e5e5e5;
+  }
+  .event-description {
+    white-space: pre-wrap;
   }
 }
