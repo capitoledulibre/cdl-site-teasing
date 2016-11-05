@@ -5798,6 +5798,29 @@ body.blog #top img {
 body.blog .navbar {
   margin-bottom: 0;
 }
+.post-date {
+  float: right;
+  margin-left: 15px;
+  position: relative;
+}
+.date-d {
+  font-size: 1.5em;
+}
+.date-d,
+.date-m {
+  line-height: 1em;
+  display: block;
+}
+.date-y {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+  display: block;
+  position: absolute;
+  top: 0.5em;
+  right: -2em;
+  color: #b1b3b4;
+}
 .day-container + .day-container {
   margin-top: 6rem;
 }
