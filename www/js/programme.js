@@ -46,7 +46,7 @@
     xhr.send();
   }
 
-  function renderEvent(event, rowSpan, colSpan) {
+  function renderEventCell(event, rowSpan, colSpan) {
     var room = ''
     var typeClass = 'event-type-'
     switch (event.type) {
@@ -65,6 +65,25 @@
       '<div class="event-persons">' + event.persons.join(', ') + '</div>' +
       room +
     '</td>'
+  }
+
+  function renderEventDiv(event) {
+    var room = ''
+    var typeClass = 'event-type-'
+    switch (event.type) {
+      case 'conference': typeClass += 'conference'; break
+      case 'atelier': typeClass += 'atelier'; break
+      case 'keynote': typeClass += 'keynote'; room = '<div class="event-room">' + event.room + '</div>'; break
+    }
+    return '<div ' +
+      'class="event ' + typeClass + '" ' +
+      'tabindex="0" ' +
+      'data-event-id="' + event.id + '"' +
+      '>' +
+      '<div class="event-title">'+ event.title +'</div>' +
+      '<div class="event-persons">' + event.persons.join(', ') + '</div>' +
+      room +
+    '</div>'
   }
 
   function createProgramTables(programXML) {
@@ -140,13 +159,13 @@
     days.forEach(function(dayInfo, dayIndex) {
       var rows = ''
       var timeByRooms = new Map(roomsArray.map(function(r) { return [r, dayInfo.start]} ))
+      var lastKeynoteEnd = dayInfo.start
       for (var idx = dayInfo.start; idx < dayInfo.end; idx++) {
-//          console.log("idx", idx, timeIntToStr(idx), (idx * TIME_SLICE) % SLOT_DURATION)
         var row = '<tr>'
         if ((idx * TIME_SLICE) % SLOT_DURATION === 0) {
           var rowSpan = SLOT_DURATION / TIME_SLICE
           var slotEndTime = idx+SLOT_DURATION/TIME_SLICE
-          row += '<td rowspan="' + rowSpan + '">' +
+          row += '<td rowspan="' + rowSpan + '" class="time-cell">' +
             '<div class="slot-times-container">' +
               '<div class="slot-times">' +
                 '<div class="time-slot-start">' + timeIntToStr(idx) + '</div>' +
@@ -157,26 +176,31 @@
             '</td>'
           var keynoteEvent = events.find(function(e) { return e.day === dayIndex && e.start === idx && e.type === 'keynote' })
           if (keynoteEvent) {
-            timeByRooms.forEach(function(duration, room) { timeByRooms.set(room, keynoteEvent.start + keynoteEvent.duration) })
-            row += renderEvent(keynoteEvent, keynoteEvent.duration, roomsArray.length)
-          } else {
-            roomsArray.forEach(function(room) {
-              var lastCellEndTime = timeByRooms.get(room)
-              var event = events.find(function(e) { return e.day === dayIndex && e.start === idx && e.room === room })
-              if (event) {
-                if (event.start < lastCellEndTime) {
-                  console.error("Two events are one the same room at the same time", room, event)
-                }
-                timeByRooms.set(room, event.start + event.duration)
-                row += renderEvent(event, event.duration, 1)
-              } else {
-                if (lastCellEndTime <= idx || (lastCellEndTime > idx && lastCellEndTime < slotEndTime)) {
-                  row += '<td rowspan="' + (slotEndTime - lastCellEndTime) + '" class="empty-slot"></td>'
-                  timeByRooms.set(room, slotEndTime)
-                }
-              }
-            })
+            lastKeynoteEnd = keynoteEvent.start + keynoteEvent.duration
           }
+          roomsArray.forEach(function(room, roomIdx) {
+            var lastCellEndTime = timeByRooms.get(room)
+            var event = events.find(function(e) { return e.day === dayIndex && e.start === idx && e.room === room && e.type !== 'keynote' })
+            if (event) {
+              if (event.start < lastCellEndTime) {
+                console.error("Two events are one the same room at the same time", room, event)
+              }
+              timeByRooms.set(room, event.start + event.duration)
+              row += renderEventCell(event, event.duration, 1)
+            } else {
+              if (lastCellEndTime <= idx || (lastCellEndTime > idx && lastCellEndTime < slotEndTime)) {
+                if (keynoteEvent) {
+                  var id = (keynoteEvent && roomIdx === 0) ? 'id="keynote' + keynoteEvent.id + '"' : ''
+                  row += '<td ' + id + ' rowspan="' + (slotEndTime - lastCellEndTime) + '" class="keynote-slot" data-duration="' + keynoteEvent.duration + '"></td>'
+                } else if (idx < lastKeynoteEnd) {
+                  row += '<td rowspan="' + (slotEndTime - lastCellEndTime) + '" class="keynote-slot"></td>'
+                } else {
+                  row += '<td rowspan="' + (slotEndTime - lastCellEndTime) + '" class="empty-slot"></td>'
+                }
+                timeByRooms.set(room, slotEndTime)
+              }
+            }
+          })
         }
         row += '</tr>'
         rows += row
@@ -198,10 +222,35 @@
           '</table>' +
           '</div>'
       )
+
+      // we draw the keynotes
+      var keynoteEvents = events.filter(function(e) { return e.day === dayIndex && e.type === 'keynote' })
+      keynoteEvents.forEach(function(event) {
+        var firstKeynoteCell = document.getElementById('keynote'+event.id)
+        if (firstKeynoteCell) {
+          var duration = parseInt(firstKeynoteCell.dataset.duration)
+          var firstKeynoteRow = firstKeynoteCell.parentElement
+          var lastKeynoteRow = firstKeynoteRow
+          for (var i = 1; i < duration; i++) {
+            lastKeynoteRow = lastKeynoteRow.nextSibling
+          }
+          var keynoteCells = Array.prototype.slice.call(firstKeynoteRow.getElementsByClassName('keynote-slot'))
+          var lastKeynoteCell = keynoteCells[keynoteCells.length - 1]
+          var width = lastKeynoteCell.getBoundingClientRect().right - firstKeynoteCell.getBoundingClientRect().left
+          var height = lastKeynoteRow.getBoundingClientRect().bottom - firstKeynoteRow.getBoundingClientRect().top
+          firstKeynoteCell.insertAdjacentHTML('beforeend',
+              '<div style="position: relative;">' +
+              '  <div style="border: solid 1px #dddddd;position: absolute;width: ' + width + 'px;height: ' + height + 'px">' +
+              renderEventDiv(event) +
+              '  </div>' +
+              '</div>'
+          )
+        }
+      })
     })
 
     // Setup the event system to show the modal with the event details
-    $('td.event').on('click keydown', function(domEvent) {
+    $('.event').on('click keydown', function(domEvent) {
       if (domEvent.type === 'keydown' && (domEvent.key !== " " && domEvent.key !== "Enter")) return
       var eventId = parseInt(this.dataset.eventId)
       var event = events.find(function(e) { return e.id === eventId })

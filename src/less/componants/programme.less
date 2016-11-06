@@ -25,9 +25,14 @@
     align-items:center;
     font-size: 75%;
   }
+  .event-cell {
+    padding: 0;
+  }
   .event{
     text-align: center;
     cursor: pointer;
+    padding: 8px;
+    height: 100%;
   }
   tbody > tr > td.event {
     vertical-align: middle;
@@ -50,11 +55,19 @@
   }
 
   .event-type-keynote {
-    background-color: #e7e7e7;
+    display:flex;
+    flex-flow: column wrap;
+    justify-content:center;
+    align-items:center;
   }
 
   .event-room {
     font-size: 90%;
+  }
+  .keynote-slot {
+    background-color: #e7e7e7;
+    padding: 0;
+    border: none;
   }
 }
 
