@@ -56,6 +56,7 @@
       case 'keynote': typeClass += 'keynote'; room = '<div class="event-room">' + event.room + '</div>'; break
     }
     return '<td ' +
+      'id="' + event.slug + '" ' +
       'rowspan="' + rowSpan + '" ' +
       'colspan="' + colSpan + '" ' +
       'class="event ' + typeClass + '" ' +
@@ -77,6 +78,7 @@
       case 'keynote': typeClass += 'keynote'; room = '<div class="event-room">' + event.room + '</div>'; break
     }
     return '<div ' +
+      'id="' + event.slug + '" ' +
       'class="event ' + typeClass + '" ' +
       'tabindex="0" ' +
       'data-event-id="' + event.id + '"' +
@@ -272,8 +274,22 @@
         console.error("Could found event with id", eventId)
         return
       }
+      window.location.hash = event.slug
       showEventDetailsModal(event)
     })
+
+    // open the event details modal if there is an event slug with the URL hash
+    if (window.location.hash !== '') {
+      var eventSlug = window.location.hash.substring(1) // remove the #
+      var event = events.find(function(e) { return e.slug === eventSlug })
+      if (event) {
+        showEventDetailsModal(event)
+        var eventElem = document.getElementById(event.slug)
+        if (eventElem) {
+          eventElem.scrollIntoView();
+        }
+      }
+    }
   }
 
   function showEventDetailsModal(event) {
