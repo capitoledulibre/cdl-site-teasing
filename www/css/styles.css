@@ -5885,6 +5885,9 @@ body.page .navbar {
 #event-details-modal .event-info {
   font-size: 90%;
 }
+#event-details-modal .event-registration {
+  margin: 0.5rem 0;
+}
 #event-details-modal .event-abstract {
   white-space: pre-wrap;
   padding: 1rem;

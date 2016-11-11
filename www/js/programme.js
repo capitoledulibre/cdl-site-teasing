@@ -6,7 +6,8 @@
   var TIME_SLICE = 5 // minutes
   var SLOT_DURATION = 30 // minutes
   var config = {
-    programmeUrl: "https://participez-2016.capitoledulibre.org/planning/program/public/?format=xml"
+    programmeUrl: "https://participez-2016.capitoledulibre.org/planning/program/public/?format=xml",
+    ponyConfUrl: "https://participez-2016.capitoledulibre.org",
   }
 
   function getChildText(parent, elemTagName) {
@@ -139,9 +140,22 @@
           event.persons = Array.prototype.slice.call(eventElem.getElementsByTagName('person')).map(function(personElem) {
             return personElem.textContent
           })
-          event.links = Array.prototype.slice.call(eventElem.getElementsByTagName('link')).map(function(linkElem) {
-            return linkElem.textContent
+          var linkElems = Array.prototype.slice.call(eventElem.getElementsByTagName('link'))
+          event.links = []
+          linkElems.forEach(function(linkElem) {
+            if (linkElem.getAttribute('tag') === 'registration') {
+              event.registrationLink = linkElem.textContent
+              return
+            }
+            event.links.push(linkElem.textContent)
           })
+          if (
+            eventElem.getElementsByTagName('attendees_max').length > 0 &&
+            eventElem.getElementsByTagName('attendees_remain').length > 0
+          ) {
+            event.attendees_max = parseInt(getChildText(eventElem, 'attendees_max'))
+            event.attendees_remain = parseInt(getChildText(eventElem, 'attendees_remain'))
+          }
           // console.log("Event", start, duration, dayInfo.end, event.title)
           events.push(event)
         } catch (e) {
@@ -276,6 +290,19 @@
       case 'keynote': type = 'Keynote'; break
     }
     modal.find('.event-type').text(type)
+    if (event.registrationLink) {
+      if (event.attendees_max === 0 || event.attendees_remain > 0) {
+        modal.find('.event-registration').html(
+          '<a href="' + config.ponyConfUrl + event.registrationLink + '">Inscription obligatoire pour cet atelier</a> ('+event.attendees_remain+' places de libre sur ' +event.attendees_max+ ')'
+        )
+      } else {
+        modal.find('.event-registration').html(
+          '<strong>Il ne reste malheureusement plus de place pour cet atelier.</strong>'
+        )
+      }
+    } else {
+      modal.find('.event-registration').text('')
+    }
     modal.find('.event-abstract').text(event.abstract)
     modal.find('.event-description').text(event.description)
     modal.modal('show')
