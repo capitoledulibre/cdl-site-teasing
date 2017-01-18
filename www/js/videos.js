@@ -43,7 +43,9 @@
               track: getChildText(eventElem, 'track'),
               type: getChildText(eventElem, 'type'),
             };
-
+            event.persons = Array.prototype.slice.call(eventElem.getElementsByTagName('person')).map(function(personElem) {
+              return personElem.textContent
+            })
             var linkElems = Array.prototype.slice.call(eventElem.getElementsByTagName('link'))
             event.links = []
             linkElems.forEach(function(linkElem) {
@@ -68,6 +70,7 @@
         '<div class="coverage media-video">' +
         '<header>' +
         '<h4>' + event.title + '</h4>' +
+        '<small>' + event.persons.join(', ') + '</small>' +
         '</header>' +
         '<video width="360" height="200" controls="controls" preload="none">' +
         '<source src="' +
