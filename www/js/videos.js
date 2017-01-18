@@ -49,20 +49,36 @@
             linkElems.forEach(function(linkElem) {
               if (linkElem.getAttribute('tag') === 'video') {
                 event.videoLink = linkElem.textContent
+                events.push(event)
                 return
               }
-              event.links.push(linkElem.textContent)
             })
 
-            events.push(event);
 
           } catch (e) {
             console.error("Error while parsing event", eventElem, e);
           }
+
       })
 
-
-
+      var html = '';
+      events.forEach( function(event) {
+        var item = '';
+        item = '<div class="col-xs-12 col-sm-6 col-md-4">' +
+        '<div class="coverage media-video">' +
+        '<header>' +
+        '<h4>' + event.title + '</h4>' +
+        '</header>' +
+        '<video width="360" height="200" controls="controls" preload="none">' +
+        '<source src="' +
+        event.videoLink +
+        '" type="video/mp4"/>' +
+        '</video>' +
+        '</div>' +
+        '</div>';
+        html += item;
+      });
+      $('.videos').append(html);
     }
 
     function init() {
