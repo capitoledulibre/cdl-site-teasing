@@ -149,6 +149,10 @@
               event.registrationLink = linkElem.textContent
               return
             }
+            if (linkElem.getAttribute('tag') === 'video') {
+              event.videoLink = linkElem.textContent
+              return
+            }
             event.links.push(linkElem.textContent)
           })
           if (
@@ -294,6 +298,7 @@
 
   function showEventDetailsModal(event) {
     var modal = $('#event-details-modal')
+
     modal.find('.event-title').text(event.title)
     modal.find('.event-persons').text(event.persons.join(', '))
     modal.find('.event-track').text(event.track)
@@ -321,6 +326,25 @@
     }
     modal.find('.event-abstract').text(event.abstract)
     modal.find('.event-description').text(event.description)
+
+    // Add Video if link exists
+    if (event.videoLink) {
+      modal.find('.event-video').html(
+        '<video width="360" height="200" controls="controls">' +
+        '<source src="' +
+        event.videoLink +
+        '" type="video/mp4"/>' +
+        '</video>'
+      );
+      modal.on('hide.bs.modal', function(event) {
+        var v = modal.find("video").get(0);
+        v.pause();
+      })
+    } else {
+      modal.find('.event-video').text('');
+      modal.unbind('hide.bs.modal');
+    }
+
     modal.modal('show')
   }
 
