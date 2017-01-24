@@ -35,7 +35,6 @@
       var eventElems = Array.prototype.slice.call(programXML.getElementsByTagName('event'));
 
       eventElems.forEach(function(eventElem) {
-          try {
             var event = {
               id: parseInt(eventElem.getAttribute('id')),
               slug: getChildText(eventElem, 'slug'),
@@ -45,21 +44,15 @@
             };
             event.persons = Array.prototype.slice.call(eventElem.getElementsByTagName('person')).map(function(personElem) {
               return personElem.textContent
-            })
-            var linkElems = Array.prototype.slice.call(eventElem.getElementsByTagName('link'))
-            event.links = []
-            linkElems.forEach(function(linkElem) {
+            });
+            event.video = Array.prototype.slice.call(eventElem.getElementsByTagName('link')).map(function(linkElem) {
               if (linkElem.getAttribute('tag') === 'video') {
-                event.videoLink = linkElem.textContent
-                events.push(event)
-                return
+                return linkElem.textContent;
               }
-            })
-
-
-          } catch (e) {
-            console.error("Error while parsing event", eventElem, e);
-          }
+            });
+            if ('video' in event) {
+                events.push(event);
+            }
 
       })
 
