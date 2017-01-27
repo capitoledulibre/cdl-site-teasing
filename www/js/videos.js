@@ -64,9 +64,9 @@
     function listVideos(programXML) {
 
       var eventsByTrack = {};
-      var eventElems = programXML.getElementsByTagName('event');
+      var eventElems = Array.prototype.slice.call(programXML.getElementsByTagName('event'));
 
-      Array.forEach(eventElems, function(eventElem) {
+      eventElems.forEach(function(eventElem) {
           var event = {
               id: parseInt(eventElem.getAttribute('id')),
               slug: getChildText(eventElem, 'slug'),
@@ -74,10 +74,12 @@
               track: getChildText(eventElem, 'track'),
               type: getChildText(eventElem, 'type'),
           };
-          event.persons = Array.map(eventElem.getElementsByTagName('person'), function(personElem) {
+          var personElems = Array.prototype.slice.call(eventElem.getElementsByTagName('person'));
+          event.persons = personElems.map(function(personElem) {
               return personElem.textContent
           });
-          Array.forEach(eventElem.getElementsByTagName('link'), function(linkElem) {
+          var linkElems = Array.prototype.slice.call(eventElem.getElementsByTagName('link'));
+          linkElems.forEach(function(linkElem) {
               // Just need video
               if (linkElem.getAttribute('tag') === 'video') {
                   event.video = linkElem.textContent;
