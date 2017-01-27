@@ -45,7 +45,8 @@
         html = '<div class="col-xs-12 col-sm-6 col-md-4">' +
             '<div class="coverage media-video">' +
             '<header>' +
-            '<h4>' + event.title + '</h4>' +
+            '<h4><a href="/programme.html#' + event.slug +'">' +
+            event.title + '</a></h4>' +
             '<small>' + event.persons.join(', ') + '</small>' +
             '</header>' +
             '<video width="360" height="200" controls="controls" preload="none">' +
